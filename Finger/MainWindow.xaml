@@ -5,8 +5,75 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Finger"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="指纹识别系统" Height="600" Width="900" Background="AliceBlue">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF712C7" FontSize="20">欢迎使用指纹识别系统@henu</Label>
+        <GridSplitter  Grid.Column="1" Grid.Row="1" Width="5" Grid.RowSpan="2" HorizontalAlignment="Stretch"/>
+        <GridSplitter  Grid.Row="1" Height="5" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"/>
+        <GroupBox Header="分布测试"  Grid.Column="0" Grid.Row="2" Grid.RowSpan="2">
+            <StackPanel>
+                <Button>第一步：载入图像</Button>
+                <Button>第二步：中值滤波</Button>
+                <Button>第三步：均衡化</Button>
+                <Button>第四步：方向计算</Button>
+                <Button>第五步：频率计算</Button>
+                <Button>第六步：掩码计算</Button>
+                <Button>第七步：Gabor增强</Button>
+                <Button>第八步：二值化</Button>
+                <Button>第九步：细化</Button>
+                <Button>第十步：特征提取</Button>
+                <Button>第十一步：特征入库</Button>
+                <Button>第十二步：特征匹配</Button>
+            </StackPanel>
+        </GroupBox>
         
+        <StackPanel Grid.Column="3" Grid.Row="2" >
+                    <GroupBox Header="登记人员">
+                        <StackPanel Orientation="Horizontal">
+                            <Label>姓名</Label>
+                            <TextBlock Width="50" Background="White"></TextBlock>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="图像操作">
+                        <StackPanel>
+                            <Button>登记</Button>
+                            <Button>识别</Button>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="指纹采集">
+                        <StackPanel>
+                            <Button>采集</Button>
+                            <Button>登记</Button>
+                            <Button>识别</Button>
+                        </StackPanel>
+                    </GroupBox>
+                    <Button>指纹库信息</Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button>退出</Button>
+                        <Button>帮助</Button>
+                    </StackPanel>
+         </StackPanel>
+        <Image Grid.Column="2"  Grid.Row="2" Width="150" Height="200"/>
+        <StackPanel Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal">
+                <Label HorizontalAlignment="Left">提示信息</Label>
+                <Button HorizontalAlignment="Right" Margin="0,5">查看日志</Button>
+            </StackPanel>
+            <TextBlock  Text="TextBlock" Background="White" FontSize="18" Height="200"/>
+        </StackPanel>
+        
+
     </Grid>
 </Window>
