@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="指纹识别系统" Height="600" Width="900" Background="AliceBlue">
+        Title="指纹识别系统" Height="600" Width="900" Background="AliceBlue" Closing="Window_Closing">
     <Grid>
         <Grid.Resources>
             <Style TargetType="Button">
@@ -23,6 +23,7 @@
                 <Setter Property="Foreground">
                     <Setter.Value>White</Setter.Value>
                 </Setter>
+                <EventSetter Event="Click" Handler="btn_click" />
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
@@ -41,46 +42,82 @@
             <Label HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFF712C7" FontSize="20">欢迎使用指纹识别系统@henu</Label>
             <Label HorizontalAlignment="left" VerticalAlignment="Center" FontSize="20">当前设备:</Label>
             <ComboBox Name="cmbIdx" HorizontalAlignment="Left" Margin="95,0,0,0" VerticalAlignment="Center" Width="50" Height="30" FontSize="20"/>
+            <Label HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="18" Margin="0,0,80,0" Foreground="Red">当前用户：</Label>
+            <Button Name="username_btn" Content="登录" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FF005AF3" FontSize="18" HorizontalContentAlignment="Left" Click="username_btn_Click"/>
         </Grid>
         <GridSplitter  Grid.Column="1" Grid.Row="1" Width="5" Grid.RowSpan="2" HorizontalAlignment="Stretch"/>
         <GridSplitter  Grid.Row="1" Height="5" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"/>
-        <GroupBox Header="分布测试"  Grid.Column="0" Grid.Row="2" Grid.RowSpan="2">
+        <GroupBox Header="登记信息"  Grid.Column="0" Grid.Row="2" Grid.RowSpan="2">
             <StackPanel>
-                <Button>第一步：载入图像</Button>
-                <Button>第二步：中值滤波</Button>
-                <Button>第三步：均衡化</Button>
-                <Button>第四步：方向计算</Button>
-                <Button >第五步：频率计算</Button>
-                <Button>第六步：掩码计算</Button>
-                <Button>第七步：Gabor增强</Button>
-                <Button>第八步：二值化</Button>
-                <Button>第九步：细化</Button>
-                <Button>第十步：特征提取</Button>
-                <Button>第十一步：特征入库</Button>
-                <Button>第十二步：特征匹配</Button>
+                <Grid Margin="0,20,0,0">
+                    <Label FontSize="18">姓名:</Label>
+                    <TextBox FontSize="18" Name="name" Background="White" Margin="60,0,10,0" VerticalContentAlignment="Center"/>
+                </Grid>
+                <Grid Margin="0,20,0,0">
+                    <Label FontSize="18">性别:</Label>
+                    <RadioButton Name="Sex" Margin="60,0,0,0" FontSize="18" VerticalContentAlignment="Center" Content="男"/>
+                    <RadioButton Margin="120,0,0,0" FontSize="18" VerticalContentAlignment="Center" Content="女"/>
+                </Grid>
+                <Grid Margin="0,20,0,0">
+                    <Label FontSize="18">年龄:</Label>
+                    <TextBox FontSize="18" Name="Age" Background="White" Margin="60,0,10,0" VerticalContentAlignment="Center"/>
+                </Grid>
+                <Grid Margin="0,20,0,0">
+                    <Label FontSize="18">手指:</Label>
+                    <ComboBox Name="Cbox" Margin="60,0,10,0" FontSize="16" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        <ComboBoxItem Content="左大拇指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="左食指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="左中指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="左无名指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="左小指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="右大拇指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="右食指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="右中指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="右无名指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ComboBoxItem Content="右小指" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ComboBox>
+                </Grid>
+                <Grid Margin="0,20,0,0">
+                    <Label FontSize="18">电话:</Label>
+                    <TextBox FontSize="18" Name="phone" Background="White" Margin="60,0,10,0" VerticalContentAlignment="Center"/>
+                </Grid>
+                <Button Margin="0,20,0,0" Click="btn_click">登记/更新</Button>
+                <Grid Margin="0,20,0,0">
+                    <StackPanel>
+                        <Label Foreground="#FFA5A4A4">技术支持：jovy-rtt</Label>
+                        <Label Foreground="#FFA5A4A4">目标框架：.NET Framework</Label>
+                        <Label Foreground="#FFA5A4A4">开发技术：WPF</Label>
+                        <Label FontFamily="Segoe Script" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center" Background="{x:Null}" Foreground="#FFAA9F9F">Henu</Label>
+                        <Label FontSize="20" FontFamily="Nirmala UI Semilight" HorizontalContentAlignment="Center" Background="{x:Null}">
+                            <Label.Foreground>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="Black" Offset="0"/>
+                                    <GradientStop Color="#FFD17070" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Label.Foreground> 指纹识别
+                        </Label>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
         </GroupBox>
         <StackPanel Grid.Column="3" Grid.Row="2" >
-            <GroupBox Header="登记人员">
-                <StackPanel Orientation="Horizontal">
-                    <Label>姓名:</Label>
-                    <TextBlock Width="150" Background="White"></TextBlock>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="图像操作">
+            <Grid>
+                <Button Width="80" Height="25" Margin="16,5,104,5" Background="#FFE5E5E5" Foreground="Black">打开</Button>
+                <Button Width="80" Height="25" Margin="106,5,14,5" Background="#FFE5E5E5" Foreground="Black">保存</Button>
+            </Grid>
+            <GroupBox Header="设备操作">
                 <StackPanel>
-                    <Button Background="Blue">登记</Button>
-                    <Button Background="Blue">识别</Button>
+                    <Button Background="Blue" Click="Button_Click">初始设备</Button>
+                    <Button Background="Blue" Click="Button_Click_1">关闭设备</Button>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="指纹采集">
                 <StackPanel>
                     <Button>采集</Button>
-                    <Button>登记</Button>
                     <Button>识别</Button>
                 </StackPanel>
             </GroupBox>
-            <Button Background="LightGoldenrodYellow" Foreground="Black" Height="50" FontSize="18" FontWeight="Bold">指纹库信息</Button>
+            <Button Background="LightGoldenrodYellow" Foreground="Black" Height="50" FontSize="18" FontWeight="Bold" Click="Button_Click_2">指纹库信息</Button>
             <StackPanel Orientation="Horizontal">
                 <Button Width="80" Height="20" Background="Brown">退出</Button>
                 <Button Width="80" Margin="20,0" Height="20" Background="Brown">帮助</Button>
@@ -92,7 +129,7 @@
         </Grid>
         <StackPanel Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2">
             <Label HorizontalAlignment="Center" FontSize="18" Foreground="Red">提示信息</Label>
-            <TextBox  Name="info" Text="TextBlock" Background="White" FontSize="18" Width="689" Height="50" Foreground="#FF005AF3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,-0.2,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+            <TextBox  Name="info" Text="我是提示信息" Background="White" FontSize="18" Width="689" Height="50" Foreground="#FF005AF3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,-0.2,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Window>

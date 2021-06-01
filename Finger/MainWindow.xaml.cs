@@ -1,4 +1,5 @@
 ﻿using libzkfpcsharp;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,7 @@ namespace Finger
     /// </summary>
     public partial class MainWindow : Window
     {
+        string filepath = "";
         //路径信息
         string rootpath = AppDomain.CurrentDomain.BaseDirectory;
         //设备句柄
@@ -31,7 +33,7 @@ namespace Finger
         IntPtr mDBHandle = IntPtr.Zero;
         bool bIsTimeToDie = false;
         bool IsRegister = false;
-        bool bIdentify = true;
+        bool bIdentify = false;
         //指纹数组
         byte[] FPBuffer;
         //注册采集时需要用到
@@ -51,18 +53,13 @@ namespace Finger
         private int mfpHeight = 0;
 
         const int MESSAGE_CAPTURED_OK = 0x0400 + 6;
-
+        List<FingerInfo> infos = new List<FingerInfo>();
         public MainWindow()
         {
             InitializeComponent();
             rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
             rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
             rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
-            if (init())
-                writelog("程序初始化成功！");
-            else
-                writelog("程序初始化失败！");
-            //writelog();
         }
 
         //初始化
@@ -151,10 +148,10 @@ namespace Finger
 
         private void writelog(string text)
         {
-            
+            Application.Current.Dispatcher.Invoke(() => { info.Text = text; });
             StreamWriter sw = new StreamWriter(rootpath+"\\Finger.log",true);
             string cur_time = DateTime.Now.ToString();
-            sw.WriteLine(cur_time + "     " + text);
+            sw.WriteLine(cur_time + "  "+ User.UserName + "   :" + text);
             sw.Close();
         }
 
@@ -167,10 +164,7 @@ namespace Finger
                 if (ret == zkfp.ZKFP_ERR_OK)
                 {
                     //捕获成功，调用委托显示该图片！
-                    writelog("捕获成功，调用委托显示该图片！");
-                    //string b64 = "";
-                    //b64 = zkfp2.BlobToBase64(FPBuffer, FPBuffer.Length);
-                    //这里可以加上数据库
+                    writelog("成功捕获本次指纹图片，调用委托显示该图片！");
                     Application.Current.Dispatcher.Invoke(() =>kernelfunc());
                 }
                 Thread.Sleep(200);
@@ -190,7 +184,6 @@ namespace Finger
             bmp.Freeze();
             img.Source = bmp;
             ms.Close();
-
             //注册
             if (IsRegister)
             {
@@ -200,12 +193,12 @@ namespace Finger
                 ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
                 if (zkfp.ZKFP_ERR_OK == ret)
                 {
-                    //textRes.Text = "This finger was already register by " + fid + "!";
+                    writelog("该指纹已经被注册!");
                     return;
                 }
                 if (RegisterCount > 0 && zkfp2.DBMatch(mDBHandle, CapTmp, RegTmps[RegisterCount - 1]) <= 0)
                 {
-                    //textRes.Text = "Please press the same finger 3 times for the enrollment";
+                    writelog("由于指纹注册时匹配错误,请用相同的指纹按压三次！");
                     return;
                 }
                 Array.Copy(CapTmp, RegTmps[RegisterCount], cbCapTmp);
@@ -218,26 +211,29 @@ namespace Finger
                     if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)) &&
                            zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBAdd(mDBHandle, iFid, RegTmp)))
                     {
+                        FingerInfo f = new FingerInfo();
+                        f.id = iFid;
+                        infos.Add(f);
                         iFid++;
-                        //textRes.Text = "enroll succ";
+                        writelog("采集已完成!请补充登记信息！");
                     }
                     else
                     {
-                        //textRes.Text = "enroll fail, error code=" + ret;
+                        writelog("注册失败，错误代码：" + ret);
                     }
                     IsRegister = false;
                     return;
                 }
                 else
                 {
-                    //textRes.Text = "You need to press the " + (REGISTER_FINGER_COUNT - RegisterCount) + " times fingerprint";
+                    writelog("请继续按压" + (REGISTER_FINGER_COUNT - RegisterCount) + "次");
                 }
             }
             else
             {
                 if (cbRegTmp <= 0)
                 {
-                    //textRes.Text = "Please register your finger first!";
+                    //writelog("请先注册你的指纹！");
                     return;
                 }
                 if (bIdentify)
@@ -247,34 +243,166 @@ namespace Finger
                     ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
                     if (zkfp.ZKFP_ERR_OK == ret)
                     {
+                        foreach (var item in infos)
+                        {
+                            if(fid == item.id)
+                            {
+                                string s = "识别结果：" + item.name + "的"+item.finger+"，" + item.sex + "，联系方式为：" + item.phone + ",识别匹配分数为:" + score + "!";
+                                writelog(s);
+                            }
+                        }
+                        bIdentify = false;
                         //textRes.Text = "Identify succ, fid= " + fid + ",score=" + score + "!";
                         return;
                     }
                     else
                     {
-                        //textRes.Text = "Identify fail, ret= " + ret;
+                        writelog("指纹识别失败，错误代码为:" + ret );
+                        bIdentify = false;
                         return;
                     }
                 }
-                else
-                {
-                    int ret = zkfp2.DBMatch(mDBHandle, CapTmp, RegTmp);
-                    if (0 < ret)
-                    {
-                        //textRes.Text = "Match finger succ, score=" + ret + "!";
-                        return;
-                    }
-                    else
-                    {
-                        //textRes.Text = "Match finger fail, ret= " + ret;
-                        return;
-                    }
-                }
+                //else
+                //{
+                //    int ret = zkfp2.DBMatch(mDBHandle, CapTmp, RegTmp);
+                //    if (0 < ret)
+                //    {
+                //        writelog("匹配指纹成功，匹配分数为："+ret+"!");
+                //        return;
+                //    }
+                //    else
+                //    {
+                //        writelog("匹配指纹失败，错误代码为：" + ret + "!");
+                //        return;
+                //    }
+                //}
             }
 
         }
 
+        //所有btn点击事件
+        private void btn_click(object sender, RoutedEventArgs e)
+        {
+            Button btn = e.Source as Button;
+            switch(btn.Content)
+            {
+                case "退出":
+                    bIsTimeToDie = true;
+                    writelog("成功退出！");
+                    zkfp2.Terminate();
+                    System.Environment.Exit(0);
+                    break;
+                case "查看日志":
+                    System.Diagnostics.Process.Start("notepad.exe", rootpath+"\\Finger.log");
+                    break;
+                case "帮助":
+                    MessageBox.Show("请联系管理员：jovy-rtt");
+                    break;
+                case "采集":
+                    IsRegister = true;
+                    info.Text = "请用相同的指纹按压3次！";
+                    break;
+                case "识别":
+                    bIdentify = true;
+                    info.Text = "请按压指纹识别器！";
+                    break;
+                case "登记/更新":
+                    foreach (var item in infos)
+                    {
+                        if(iFid-1 == item.id)
+                        {
+                            item.name = name.Text;
+                            item.phone = phone.Text;
+                            if (Sex.IsChecked == null || Sex.IsChecked == false)
+                                item.sex = "女";
+                            else
+                                item.sex = "男";
+                            item.finger = Cbox.Text;
+                        }
+                    }
+                    writelog("id为："+iFid+" 的指纹信息已登记/更新！");
+                    break;
+                case "打开":
+                    
+                    OpenFileDialog obj = new OpenFileDialog();
+                    if (obj.ShowDialog() == true)
+                        filepath = obj.FileName;
+                    BitmapImage bimg = new BitmapImage(new Uri(filepath));
+                    img.Source = bimg;
+                    break;
+                case "保存":
+                    SaveFileDialog save = new SaveFileDialog();
+                    save.Filter = "Image Files (*.bmp, *.png, *.jpg)|*.bmp;*.png;*.jpg | All Files | *.*";
+                    save.RestoreDirectory = true;
+                    if(save.ShowDialog()==true)
+                    {
+                        var encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(BitmapFrame.Create((BitmapSource)this.img.Source));
+                        using (FileStream stream = new FileStream(save.FileName, FileMode.Create))
+                            encoder.Save(stream);
+                    }
+                    break;
+                default:
+                    //MessageBox.Show("该控件并未注册点击事件，请先注册！");
+                    break;
+                
+            }
+        }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            bIsTimeToDie = true;
+            writelog("成功退出！");
+            zkfp2.Terminate();
+        }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (init())
+                writelog("程序初始化成功！");
+            else
+                writelog("程序初始化失败！");
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            zkfp2.Terminate();
+            cmbIdx.Items.Clear();
+            writelog("已成功关闭设备");
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            ShowInfo dbinfo = new ShowInfo();
+            writelog("用户查看指纹库信息！");
+            User.infos = infos;
+            dbinfo.ShowDialog();
+        }
+
+        private void username_btn_Click(object sender, RoutedEventArgs e)
+        {
+            Login login = new Login();
+            writelog("用户登录！");
+            login.ShowDialog();
+            checkuser();
+        }
+
+        public void checkuser()
+        {
+            if (User.UserAccount == "admin")
+            {
+                username_btn.Content = User.UserName;
+                username_btn.IsEnabled = false;
+            }
+        }
+
+        public bool IsRoot()
+        {
+            if (User.UserAccount == "admin")
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
