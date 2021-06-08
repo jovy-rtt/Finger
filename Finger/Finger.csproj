@@ -82,6 +82,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MYAES.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>

@@ -8,5 +8,7 @@
         Title="ShowInfo" Height="450" Width="800">
     <Grid>
         <DataGrid Name="dg" HorizontalAlignment="Left" Height="332" Margin="23,56,0,0" VerticalAlignment="Top" Width="747"/>
+        <Label Content="指纹识别系统数据库信息表" HorizontalAlignment="Center" Foreground="#FFF712C7" FontSize="20" VerticalAlignment="Top" Margin="282,15,257.6,0" Width="254"/>
+        <Label FontFamily="Segoe Script" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center" Background="{x:Null}" Foreground="#FFAA9F9F" Margin="578,14,8.6,369">Henu</Label>
     </Grid>
 </Window>

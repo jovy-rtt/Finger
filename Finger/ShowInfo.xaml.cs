@@ -26,11 +26,12 @@ namespace Finger
             var q = from t1 in t
                     select new
                     {
-                        a = t1.id,
-                        b = t1.name,
-                        c = t1.sex,
-                        d = t1.phone,
-                        f = t1.finger
+                        ID = t1.id,
+                        姓名 = t1.name,
+                        性别 = t1.sex,
+                        年龄 = t1.age,
+                        手机号 = t1.phone,
+                        手指类别 = t1.finger
                     };
             dg.ItemsSource = q.ToList();
         }

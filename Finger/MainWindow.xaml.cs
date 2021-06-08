@@ -58,8 +58,9 @@ namespace Finger
         {
             InitializeComponent();
             rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
-            rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
-            rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
+            MYAES.AesDecrypt(rootpath + "\\Finger.log", User.UserPassword);
+            //rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
+            //rootpath = rootpath.Substring(0, rootpath.LastIndexOf("\\"));
         }
 
         //初始化
@@ -247,7 +248,7 @@ namespace Finger
                         {
                             if(fid == item.id)
                             {
-                                string s = "识别结果：" + item.name + "的"+item.finger+"，" + item.sex + "，联系方式为：" + item.phone + ",识别匹配分数为:" + score + "!";
+                                string s = "识别结果：" + item.name + "的"+item.finger+"，" + item.sex+"，"+item.age + "岁，联系方式为：" + item.phone + ",识别匹配分数为:" + score + "!";
                                 writelog(s);
                             }
                         }
@@ -313,6 +314,7 @@ namespace Finger
                         {
                             item.name = name.Text;
                             item.phone = phone.Text;
+                            item.age = Age.Text;
                             if (Sex.IsChecked == null || Sex.IsChecked == false)
                                 item.sex = "女";
                             else
@@ -320,7 +322,7 @@ namespace Finger
                             item.finger = Cbox.Text;
                         }
                     }
-                    writelog("id为："+iFid+" 的指纹信息已登记/更新！");
+                    writelog("id为："+(iFid-1).ToString()+" 的指纹信息已登记/更新！");
                     break;
                 case "打开":
                     
@@ -354,6 +356,7 @@ namespace Finger
             bIsTimeToDie = true;
             writelog("成功退出！");
             zkfp2.Terminate();
+            MYAES.AesEncrypt(rootpath + "\\Finger.log", User.UserPassword);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -373,9 +376,9 @@ namespace Finger
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            User.infos = infos;
             ShowInfo dbinfo = new ShowInfo();
             writelog("用户查看指纹库信息！");
-            User.infos = infos;
             dbinfo.ShowDialog();
         }
 
